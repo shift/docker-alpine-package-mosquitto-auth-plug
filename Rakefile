@@ -18,7 +18,7 @@ end
 task :default => [:build, :features, :audit, :create_private_key, :package]
 
 task :create_private_key do
-  sh "docker run -it -v $(pwd)/keys:/home/automation/.abuild shift/mosquitto-auth-plug-build abuild-keygen -a"
+  sh "docker run -it -v $(pwd)/keys:/home/automation/.abuild shift/mosquitto-auth-plug-build abuild-keygen -a -n"
 end
 
 task :package do
