@@ -23,6 +23,6 @@ end
 
 task :package do
   sh "docker run -it -v $(pwd)/pkg:/home/automation/packages -v $(pwd)/apkbuild:/home/automation/mosquitto-auth-plug -v $(pwd)/keys:/home/automation/.abuild shift/mosquitto-auth-plug-build abuild -r"
-  sh "mkdir -p $CIRCLE_ARTIFACTS && find pkg/automation/x86_64 -name \"*.apk\" | xargs mv $CIRCLE_ARTIFACTS"
+  sh "mkdir -p $CIRCLE_ARTIFACTS && mv $(find pkg/automation/x86_64 -name \"*.apk\") $CIRCLE_ARTIFACTS/"
 end
 
