@@ -1,0 +1,54 @@
+# Contributor:
+# Maintainer: Vincent Palmer <shift@someone.section.me>
+pkgname=mosquitto-auth-plug
+pkgver=0.0.7
+pkgrel=0
+pkgdesc="mosquitto authentication plugin for the MQTT broker"
+url="https://github.com/jpmens/mosquitto-auth-plug/"
+arch="all"
+license="src/mosquitto-auth-plug-0.0.7/LICENSE.txt"
+depends="mosquitto"
+depends_dev=""
+makedepends="$depends_dev mariadb-dev postgresql-dev mosquitto-dev openldap-dev curl-dev openssl-dev c-ares-dev util-linux-dev
+	libwebsockets-dev"
+install="$pkgname.pre-install $pkgname.post-install"
+subpackages=""
+source="saveas-https://github.com/jpmens/$pkgname/archive/$pkgver.tar.gz/$pkgname-$pkgver.tar.gz
+        http://mosquitto.org/files/source/mosquitto-1.4.8.tar.gz
+	"
+
+_builddir=
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+	cd mosquitto-1.4.8
+	make
+	cd ../$pkgname-$pkgver
+	cp config.mk.in config.mk || return 1
+	sed -i -e 's/= no/= yes/g' config.mk || return 1
+        sed -i -e 's/MONGO \?= yes/MONGO \?= no/g' config.mk || return 1
+}
+
+build() {
+	cd "$_builddir"
+	make
+}
+
+package() {
+        echo $(pwd)
+	cd "$_builddir"
+	mkdir -p "$pkgdir"/usr/share/mosquitto/auth-plug
+        cp src/$pkgname-$pkgver/auth-plug.so "$pkgdir"/usr/share/mosquitto/auth-plug/auth-plug.so       
+}
+
+md5sums="13f0f38991cca9ca762c2a11f9562917  mosquitto-auth-plug-0.0.7.tar.gz
+d859cd474ffa61a6197bdabe007b9027  mosquitto-1.4.8.tar.gz"
+sha256sums="21bd905cce3e8a3e5094df1da79cd604a79da5de2ac47bf98c669f621459cf71  mosquitto-auth-plug-0.0.7.tar.gz
+d96eb5610e57cc3e273f4527d3f54358ab7711459941a9e64bc4d0a85c2acfda  mosquitto-1.4.8.tar.gz"
+sha512sums="b88e49a3e77d76d48513454de9be596e6f8050cb04e61271d1c7dde7d3d500c00e4446ab9c6ba825c04ab22a0d4683a860dd1b5d87c00e7c60b7867e303f8f1b  mosquitto-auth-plug-0.0.7.tar.gz
+4bad8683e98ec858468c53f85f53b42a4166667cebf665d11d3dabe604711f5031da007c8f6d6cb49b8bc91b87eb452bc1f8bfa6adf2d439d2223180b316f9bc  mosquitto-1.4.8.tar.gz"
